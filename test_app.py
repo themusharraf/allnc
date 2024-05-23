@@ -145,3 +145,6 @@ def test_middleware_method_are_called(app, test_client):
 
     assert process_request_called is True
     assert process_response_called is True
+
+    def process():
+        pass
