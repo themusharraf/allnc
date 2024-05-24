@@ -4,12 +4,12 @@ from middleware import Middleware
 app = AllNc()
 
 
-@app.route("/home")
+@app.route("/home", allowed_methods=["get"])
 def home(request, response):
     response.text = "Hello from the Home Page"
 
 
-@app.route("/about")
+@app.route("/about", allowed_methods=["put"])
 def about(request, response):
     response.text = "Hello from the About Page"
 
