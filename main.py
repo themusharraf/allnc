@@ -1,3 +1,4 @@
+import json
 from app import AllNc
 from middleware import Middleware
 
@@ -37,10 +38,16 @@ app.add_route("/new-handler", new_handler)
 
 @app.route("/template")
 def template_handler(req, resp):
-    resp.body = app.template(
+    resp.html = app.template(
         "home.html",
         context={"new_title": "Best title", "new_body": "Best body"},
     )
+
+
+@app.route("/json")
+def json_handler(req, resp):
+    response_data = {"name": "some name", "type": "json"}
+    resp.json = response_data
 
 
 def on_exception(req, resp, exc):

@@ -3,10 +3,11 @@ import inspect
 import requests
 import wsgiadapter
 from parse import parse
-from webob import Request, Response
+from webob import Request
+from response import Response
 from whitenoise import WhiteNoise
-from jinja2 import Environment, FileSystemLoader
 from middleware import Middleware
+from jinja2 import Environment, FileSystemLoader
 
 
 class AllNc:
@@ -100,7 +101,7 @@ class AllNc:
     def template(self, template_name, context=None):
         if context is None:
             context = {}
-        return self.template_env.get_template(template_name).render(**context).encode()
+        return self.template_env.get_template(template_name).render(**context)
 
     def add_exception_handler(self, handler):
         self.exception_handler = handler
