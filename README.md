@@ -106,7 +106,7 @@ Note that if you specify `methods` for class based handlers, they will be ignore
 ## Unit Tests
 
 The recommended way of writing unit tests is with [pytest](https://docs.pytest.org/en/latest/). There are two built in fixtures
-that you may want to use when writing unit tests with Alcazar. The first one is `app` which is an instance of the main `Alcazar` class:
+that you may want to use when writing unit tests with Alcazar. The first one is `app` which is an instance of the main `AllNc` class:
 
 ```python
 def test_route_overlap_throws_exception(app):
