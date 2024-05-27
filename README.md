@@ -30,12 +30,12 @@ from allnc.middleware import Middleware
 app = AllNc()
 
 
-@app.route("/home", allowed_methods=["get"])
+@app.route("/home")
 def home(request, response):
     response.text = "Hello from the Home Page"
 
 
-@app.route("/about", allowed_methods=["put"])
+@app.route("/about")
 def about(request, response):
     response.text = "Hello from the About Page"
 
@@ -87,10 +87,9 @@ gunicorn app:app
 If you use class based handlers, only the methods that you implement will be allowed:
 
 ```python
-@app.route("/{name:l}")
-class GreetingHandler:
-    def get(self, req, resp, name):
-        resp.text = f"Hello, {name}"
+@app.route("/hello/{name}")
+def greeting(request, response, name):
+    response.text = f"Hello {name}"
 ```
 
 This handler will only allow `GET` requests. That is, `POST` and others will be rejected. The same thing can be done with
