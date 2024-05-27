@@ -205,7 +205,7 @@ show the exception message. If the raised exception is not an HTTPError and if `
 
 ## Middleware
 
-You can create custom middleware classes by inheriting from the `alcazar.middleware.Middleware` class and override its two methods
+You can create custom middleware classes by inheriting from the `allnc.middleware.Middleware` class and override its two methods
 that are called before and after each request:
 
 ```python
