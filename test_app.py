@@ -1,5 +1,5 @@
 import pytest
-from middleware import Middleware
+from allnc.middleware import Middleware
 
 
 def test_basic_route_adding(app):

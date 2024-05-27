@@ -1,6 +1,5 @@
-import json
-from app import AllNc
-from middleware import Middleware
+from allnc.app import AllNc
+from allnc.middleware import Middleware
 
 app = AllNc()
 

@@ -1,5 +1,5 @@
 import pytest
-from app import AllNc
+from allnc.app import AllNc
 
 
 @pytest.fixture

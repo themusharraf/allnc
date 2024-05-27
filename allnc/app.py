@@ -4,9 +4,9 @@ import requests
 import wsgiadapter
 from parse import parse
 from webob import Request
-from response import Response
+from .response import Response
 from whitenoise import WhiteNoise
-from middleware import Middleware
+from .middleware import Middleware
 from jinja2 import Environment, FileSystemLoader
 
 
