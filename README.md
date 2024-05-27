@@ -1,7 +1,7 @@
        
 
 
-![coverage](https://img.shields.io/badge/coverage-100-green)   ![PyPI - Version](https://img.shields.io/pypi/v/allnc)
+![purpose](https://img.shields.io/badge/purpose-learning-green.svg) ![coverage](https://img.shields.io/badge/coverage-100-green)   ![PyPI - Version](https://img.shields.io/pypi/v/allnc) 
 
 # AllNc  
 
