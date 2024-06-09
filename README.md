@@ -1,7 +1,7 @@
 ![Screenshot from 2024-05-27 15-02-59](https://github.com/themusharraf/allnc/assets/122869450/859d4911-8e2b-45d3-af78-ff64cd51ff4a)
        
    
-
+ 
 ![purpose](https://img.shields.io/badge/purpose-learning-green.svg) ![coverage](https://img.shields.io/badge/coverage-100-green)   ![PyPI - Version](https://img.shields.io/pypi/v/allnc)   
  
 # AllNc         
