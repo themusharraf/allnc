@@ -22,7 +22,7 @@ pip install allnc
   
 ## How to use it
 asic Usage:
-
+ 
 ```python
 # app.py
 from allnc.app import AllNc
