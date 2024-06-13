@@ -30,7 +30,7 @@ from allnc.middleware import Middleware
 app = AllNc()
 
 
-@app.route("/home")
+@app.route("/home") 
 def home(request, response):
     response.text = "Hello from the Home Page"
 
