@@ -18,7 +18,7 @@ It is a WSGI framework and can be used with any WSGI application server such as 
 pip install allnc
 ```
    
-  
+   
 ## How to use it
 asic Usage:
  
