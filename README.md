@@ -2,7 +2,7 @@
       
   
 ![purpose](https://img.shields.io/badge/purpose-learning-green.svg) ![coverage](https://img.shields.io/badge/coverage-100-green)   ![PyPI - Version](https://img.shields.io/pypi/v/allnc)        
-  
+   
 # AllNc           
    
 AllNc is a Python Web Framework built for learning purposes. The plan is to learn how frameworks  
