@@ -20,7 +20,7 @@ pip install allnc
    
    
 ## How to use it
-asic Usage:
+Basic usage:
  
 ```python
 # app.py
@@ -96,12 +96,12 @@ This handler will only allow `GET` requests. That is, `POST` and others will be 
 function based handlers in the following way:
 
 ```python
-@app.route("/", methods=["get"])
+@app.route("/", allowed_methods=["get"])
 def home(req, resp):
     resp.text = "Hello, this is a home page."
 ```
 
-Note that if you specify `methods` for class based handlers, they will be ignored.
+Note that if you specify `allowed_methods` for class based handlers, they will be ignored.
 
 ## Unit Tests
 

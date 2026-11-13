@@ -8,3 +8,9 @@
 pyvenv.cfg
 .venv
 pip-selfcheck.json
+
+# Tooling
+.coverage
+.idea/
+__pycache__/
+.pytest_cache/
