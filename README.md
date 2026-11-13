@@ -1,245 +1,253 @@
-![Screenshot from 2024-05-27 15-02-59](https://github.com/themusharraf/allnc/assets/122869450/859d4911-8e2b-45d3-af78-ff64cd51ff4a)        
-      
-  
-![purpose](https://img.shields.io/badge/purpose-learning-green.svg) ![coverage](https://img.shields.io/badge/coverage-100-green)   ![PyPI - Version](https://img.shields.io/pypi/v/allnc)        
-   
-# AllNc           
-   
-AllNc is a Python Web Framework built for learning purposes. The plan is to learn how frameworks    
-are built by implementing their features, writing blog posts about them and keeping the codebase  
-as simple as possible.
+<div align="center">
 
-It is a WSGI framework and can be used with any WSGI application server such as Gunicorn.
+# AllNc
 
-    
-## Installation
+**A tiny Python web framework you can read in one sitting.**
+
+Routing, class-based views, templates, static files, middleware and a test client in about 170 lines of code.
+Built to show how frameworks like Flask and Django work on the inside.
+
+[![PyPI](https://img.shields.io/pypi/v/allnc)](https://pypi.org/project/allnc/)
+![Python](https://img.shields.io/badge/python-3.11%2B-blue)
+![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)
+![Purpose](https://img.shields.io/badge/purpose-learning-green)
+
+![AllNc demo](https://github.com/themusharraf/allnc/assets/122869450/859d4911-8e2b-45d3-af78-ff64cd51ff4a)
+
+</div>
+
+## Why AllNc?
+
+Most web frameworks are too big to read. AllNc does the same core work in a codebase small enough to open in one tab:
+
+| File | Lines | What it shows |
+|---|---|---|
+| [`allnc/app.py`](allnc/app.py) | ~110 | WSGI entry point, routing with URL parameters, method checks, templates, static files |
+| [`allnc/middleware.py`](allnc/middleware.py) | ~30 | How middleware wraps an app (the "onion" model) |
+| [`allnc/response.py`](allnc/response.py) | ~30 | Turning `.text`, `.html` and `.json` into a real HTTP response |
+
+Read it, change it, break it, and you will understand what `@app.route` does in any framework.
+
+## Quick start
 
 ```shell
-pip install allnc
+pip install allnc gunicorn
 ```
-   
-   
-## How to use it
-Basic usage:
- 
+
 ```python
 # app.py
 from allnc.app import AllNc
-from allnc.middleware import Middleware
 
 app = AllNc()
 
 
-@app.route("/home") 
+@app.route("/")
 def home(request, response):
-    response.text = "Hello from the Home Page"
-
-
-@app.route("/about")
-def about(request, response):
-    response.text = "Hello from the About Page"
+    response.text = "Hello from AllNc!"
 
 
 @app.route("/hello/{name}")
 def greeting(request, response, name):
-    response.text = f"Hello {name}"
-
-
-@app.route("/books")
-class Books:
-    def get(self, request, response):
-        response.text = "Hello from the Books Page"
-
-    def post(self, request, response):
-        response.text = "Endpoint to create a  book"
-
-
-def new_handler(req, resp):
-    resp.text = "From new Handler"
-
-
-app.add_route("/new-handler", new_handler)
-
-
-@app.route("/template")
-def template_handler(req, resp):
-    resp.html = app.template(
-        "home.html",
-        context={"new_title": "Best title", "new_body": "Best body"},
-    )
-
-
-@app.route("/json")
-def json_handler(req, resp):
-    response_data = {"name": "some name", "type": "json"}
-    resp.json = response_data
-
+    response.json = {"message": f"Hello, {name}"}
 ```
 
-Start:
-
-```bash
+```shell
 gunicorn app:app
 ```
 
-## Handlers
+Open http://127.0.0.1:8000/hello/World.
 
-If you use class based handlers, only the methods that you implement will be allowed:
+## Features
 
-```python
-@app.route("/hello/{name}")
-def greeting(request, response, name):
-    response.text = f"Hello {name}"
+- WSGI compatible: runs on Gunicorn, uWSGI or any WSGI server
+- Routing with URL parameters (`/hello/{name}`)
+- Function-based and class-based handlers
+- Allowed HTTP methods per route (`405 Method Not Allowed` otherwise)
+- Jinja2 templates
+- Static files (served by WhiteNoise)
+- Text, HTML and JSON response helpers
+- Custom exception handler
+- Middleware
+- Built-in test client (no running server needed)
+
+## How a request flows
+
+```mermaid
+flowchart LR
+    S[WSGI server] --> A[AllNc.__call__]
+    A -->|/static/...| W[WhiteNoise]
+    A --> M[Middleware chain]
+    M --> R[find_handler: match URL]
+    R -->|found| H[your handler]
+    R -->|not found| N[404 Not Found]
+    H --> P[Response: text / html / json]
 ```
 
-This handler will only allow `GET` requests. That is, `POST` and others will be rejected. The same thing can be done with
-function based handlers in the following way:
+## Guide
+
+### Routing
 
 ```python
-@app.route("/", allowed_methods=["get"])
-def home(req, resp):
-    resp.text = "Hello, this is a home page."
+@app.route("/books/{book_id:d}")  # :d converts the parameter to int
+def book(request, response, book_id):
+    response.json = {"id": book_id}
+
+
+def about(request, response):
+    response.text = "About page"
+
+
+app.add_route("/about", about)  # same as the decorator
 ```
 
-Note that if you specify `allowed_methods` for class based handlers, they will be ignored.
+Two routes with the same path raise an `AssertionError`, so mistakes show up at startup.
 
-## Unit Tests
+### Allowed methods
 
-The recommended way of writing unit tests is with [pytest](https://docs.pytest.org/en/latest/). There are two built in fixtures
-that you may want to use when writing unit tests with AllNc. The first one is `app` which is an instance of the main `AllNc` class:
+Function handlers accept every method unless you limit them:
 
 ```python
-def test_route_overlap_throws_exception(app):
-    @app.route("/")
-    def home(req, resp):
-        resp.text = "Welcome Home."
-
-    with pytest.raises(AssertionError):
-        @app.route("/")
-        def home2(req, resp):
-            resp.text = "Welcome Home2."
+@app.route("/login", allowed_methods=["post"])
+def login(request, response):
+    response.text = "Logged in"
 ```
 
-The other one is `client` that you can use to send HTTP requests to your handlers. It is based on the famous [requests](http://docs.python-requests.org/en/master/) and it should feel very familiar:
+Class-based handlers allow only the methods they define. `allowed_methods` is ignored for them:
 
 ```python
-def test_parameterized_routing(app, test_client):
+@app.route("/books")
+class Books:
+    def get(self, request, response):
+        response.text = "List of books"
+
+    def post(self, request, response):
+        response.text = "Book created"
+```
+
+`DELETE /books` returns `405 Method Not Allowed`.
+
+### Responses
+
+```python
+response.text = "plain text"               # text/plain
+response.html = "<h1>Hello</h1>"           # text/html
+response.json = {"ok": True}               # application/json
+response.status_code = 201
+```
+
+### Templates
+
+Templates live in `templates/` by default:
+
+```python
+app = AllNc(templates_dir="templates")
+
+
+@app.route("/page")
+def page(request, response):
+    response.html = app.template("home.html", context={"title": "AllNc", "body": "Hello!"})
+```
+
+### Static files
+
+Files in `static/` are served under `/static/`:
+
+```python
+app = AllNc(static_dir="static")
+```
+
+```html
+<link href="/static/main.css" rel="stylesheet">
+```
+
+### Custom exception handler
+
+```python
+def on_exception(request, response, exception):
+    response.status_code = 500
+    response.text = f"Something went wrong: {exception}"
+
+
+app.add_exception_handler(on_exception)
+```
+
+Without a handler, the exception is raised as usual.
+
+### Middleware
+
+Subclass `Middleware` and override the hooks that run before and after each request:
+
+```python
+from allnc.middleware import Middleware
+
+
+class TimingMiddleware(Middleware):
+    def process_request(self, request):
+        print("->", request.method, request.path)
+
+    def process_response(self, request, response):
+        print("<-", response.status_code)
+
+
+app.add_middleware(TimingMiddleware)
+```
+
+## Testing
+
+`app.test_session()` returns a [requests](https://requests.readthedocs.io/) session wired straight to your app, so tests need no running server:
+
+```python
+# conftest.py
+import pytest
+from allnc.app import AllNc
+
+
+@pytest.fixture
+def app():
+    return AllNc()
+
+
+@pytest.fixture
+def test_client(app):
+    return app.test_session()
+```
+
+```python
+# test_app.py
+def test_greeting(app, test_client):
     @app.route("/hello/{name}")
     def greeting(request, response, name):
         response.text = f"Hello {name}"
 
     assert test_client.get("http://testserver/hello/John").text == "Hello John"
-    assert test_client.get("http://testserver/hello/Musharraf").text == "Hello Musharraf"
 ```
 
+Run the framework's own tests:
 
-
-## Templates
-
-The default folder for templates is `templates`. You can change it when initializing the main `AllNc()` class:
-
-```python
-app = AllNc(templates_dir="templates_dir_name")
+```shell
+git clone https://github.com/themusharraf/allnc && cd allnc
+pip install -r requirements.txt
+pytest
 ```
 
-Then you can use HTML files in that folder like so in a handler:
+## Roadmap
 
-```python
-@app.route("/show/template")
-def handler_with_template(req, resp):
-    resp.html = app.template("example.html", context={"title": "Awesome Framework", "body": "welcome to the future!"})
-```
+Good first contributions, each small enough to learn from:
 
-## Static Files
+- [ ] Query parameters helper (`request.args`)
+- [ ] Redirect response helper
+- [ ] Route groups / blueprints
+- [ ] Async (ASGI) version
+- [ ] Simple ORM on top of SQLite
 
-Just like templates, the default folder for static files is `static` and you can override it:
+Pick one, open an issue, and send a PR.
 
-```python
-app = AllNc(static_dir="static_dir_name")
-```
+## O'zbekcha
 
-Then you can use the files inside this folder in HTML files:
+AllNc — Flask va Django ichida nima bo'layotganini tushunish uchun yozilgan kichik Python web framework.
+Butun kod ~170 qator: bir o'tirishda o'qib chiqib, routing, middleware va WSGI qanday ishlashini o'rganasiz.
+Savollar va takliflar uchun issue oching. Foydali bo'lsa, ⭐ bosib qo'llab-quvvatlang.
 
-```html
-<!DOCTYPE html>
-<html lang="en">
+## License
 
-<head>
-  <meta charset="UTF-8">
-  <title>{{title}}</title>
-
-  <link href="/static/main.css" rel="stylesheet" type="text/css">
-</head>
-
-<body>
-    <h1>{{body}}</h1>
-    <p>This is a paragraph</p>
-</body>
-</html>
-```
-
-## Custom Exception Handler
-
-Sometimes, depending on the exception raised, you may want to do a certain action. For such cases, you can register an exception handler:
-
-```python
-def on_exception(req, resp, exception):
-    if isinstance(exception, HTTPError):
-        if exception.status == 404:
-            resp.text = "Unfortunately the thing you were looking for was not found"
-        else:
-            resp.text = str(exception)
-    else:
-        # unexpected exceptions
-        if app.debug:
-            debug_exception_handler(req, resp, exception)
-        else:
-            print("These unexpected exceptions should be logged.")
-
-app = AllNc(debug=False)
-app.add_exception_handler(on_exception)
-```
-
-This exception handler will catch 404 HTTPErrors and change the text to `"Unfortunately the thing you were looking for was not found"`. For other HTTPErrors, it will simply
-show the exception message. If the raised exception is not an HTTPError and if `debug` is set to True, it will show the exception and its traceback. Otherwise, it will log it.
-
-## Middleware
-
-You can create custom middleware classes by inheriting from the `allnc.middleware.Middleware` class and override its two methods
-that are called before and after each request:
-
-```python
-from allnc.app import AllNc
-from allnc.middleware import Middleware
-
-app = AllNc()
-
-
-class SimpleCustomMiddleware(Middleware):
-    def process_request(self, req):
-        print("Before dispatch", req.url)
-
-    def process_response(self, req, res):
-        print("After dispatch", req.url)
-
-
-app.add_middleware(SimpleCustomMiddleware)
-```
-
-
-## Features
-
-- WSGI compatible
-- Built-in ORM
-- Parameterized and basic routing
-- Class based handlers
-- Test Client
-- Support for templates
-- Support for static files
-- Custom exception handler
-- Middleware
-
-## Note
-
-It is extremely raw and will hopefully keep improving. If you are interested in knowing how a particular feature is implemented in other
-frameworks, please open an issue and we will hopefully implement and explain it in a blog post
+MIT
