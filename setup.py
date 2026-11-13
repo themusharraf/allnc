@@ -14,7 +14,7 @@ from setuptools import find_packages, setup, Command
 # Package meta-data.
 NAME = 'allnc'
 DESCRIPTION = 'Python Web Framework for building web applications'
-URL = 'https://github.com/me/myproject'
+URL = 'https://github.com/themusharraf/allnc'
 EMAIL = 'meibrohimov@gmail.com'
 AUTHOR = 'Musharraf Ibragimov'
 REQUIRES_PYTHON = '>=3.11.0'

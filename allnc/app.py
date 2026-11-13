@@ -81,7 +81,7 @@ class AllNc:
         response.text = "Not Found."
 
     def add_route(self, path, handler, allowed_methods=None):
-        assert path not in self.routes, "Duplicate route. Place change the  URL."
+        assert path not in self.routes, "Duplicate route. Please change the URL."
         if allowed_methods is None:
             allowed_methods = ["get", "post", "put", "delete", "head", "options", "trace", "connect", "patch"]
         self.routes[path] = {"handler": handler, "allowed_methods": allowed_methods}
